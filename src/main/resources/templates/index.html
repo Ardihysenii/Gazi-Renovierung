@@ -33,6 +33,11 @@
             display: block;
         }
 
+        /* Klasa që do të aplikohet kur linku është aktiv */
+        .nav-links li a.active-link {
+            color: #b8860b !important;
+        }
+
         /* LOADING SPINNER & ALERTS */
         .btn-loading {
             position: relative;
@@ -90,7 +95,6 @@
                 z-index: 10001;
             }
 
-            /* Sigurohemi qe logoja te jete mbi overlay */
             .logo {
                 position: relative;
                 z-index: 10005;
@@ -105,7 +109,7 @@
                 flex-direction: row;
                 align-items: center;
                 cursor: pointer;
-                z-index: 10005; /* Ngritur mbi overlay */
+                z-index: 10005;
                 position: relative;
                 flex-grow: 1;
             }
@@ -148,7 +152,7 @@
                 align-items: center;
                 justify-content: center;
                 transition: 0.5s cubic-bezier(0.77,0.2,0.05,1.0);
-                z-index: 9998; /* Overlay qendron poshte logos/toggle */
+                z-index: 9998;
                 margin: 0;
                 padding: 0;
                 list-style: none;
@@ -211,33 +215,18 @@
             color: #444;
             font-family: 'Montserrat', sans-serif;
         }
-        /* Footer */
+
         .logoo {
-            /* Përdorimi i një fonti 'Serif' për pamje klasike */
             font-family: 'Playfair Display', 'Times New Roman', serif;
             margin-bottom: 20px;
-            /* Madhësia e shkronjave */
             font-size: 28px;
-
-            /* Trashësia e shkronjave */
             font-weight: 700;
-
-            /* Shkronjat e mëdha (si në foto) */
             text-transform: uppercase;
-
-            /* Hapësira mes shkronjave (Kritike për këtë dizajn) */
             letter-spacing: 2px;
-
-            /* Ngjyra e errët e hirtë/zi */
             color: #1a1a1a;
-
-            /* Rregullimi i linjës */
             line-height: 1.2;
-
-            /* Opsionale: Kursive nëse dëshiron saktësisht si logoja */
             display: inline-block;
         }
-
     </style>
 </head>
 <body>
@@ -261,7 +250,7 @@
 
         <nav>
             <ul class="nav-links" id="nav-list">
-                <li><a th:href="@{/}" style="color: #b8860b;">Startseite</a></li>
+                <li><a th:href="@{/}" class="active-link">Startseite</a></li>
                 <li><a th:href="@{/portfolio}">Portfolio</a></li>
                 <li><a href="#services">Leistungen</a></li>
                 <li><a href="#contact">Kontakt</a></li>
@@ -284,8 +273,6 @@
                 <a th:href="@{/portfolio}" class="btn-gold">Unsere Projekte</a>
             </div>
             <div class="hero-image-wrapper"></div>
-
-
         </div>
     </section>
 
@@ -362,6 +349,24 @@
 <script>
     const menuToggle = document.getElementById('mobile-menu');
     const navList = document.getElementById('nav-list');
+    const navLinks = document.querySelectorAll('#nav-list a');
+
+    // Funksioni për të ndërruar ngjyrën Gold te linku i klikuar
+    navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            // Heq ngjyrën gold nga të gjithë
+            navLinks.forEach(l => l.classList.remove('active-link'));
+            // Ia shton ngjyrën gold vetëm këtij që u klikua
+            this.classList.add('active-link');
+
+            // Mbyll menunë nëse është mobile
+            if(menuToggle && menuToggle.classList.contains('open')){
+                menuToggle.classList.remove('open');
+                navList.classList.remove('active');
+                document.body.classList.remove('no-scroll');
+            }
+        });
+    });
 
     if (menuToggle) {
         menuToggle.addEventListener('click', function(e) {
@@ -380,16 +385,6 @@
             submitBtn.classList.add('btn-loading');
         });
     }
-
-    document.querySelectorAll('#nav-list a').forEach(link => {
-        link.addEventListener('click', () => {
-            if(menuToggle && menuToggle.classList.contains('open')){
-                menuToggle.classList.remove('open');
-                navList.classList.remove('active');
-                document.body.classList.remove('no-scroll');
-            }
-        });
-    });
 </script>
 
 <script th:src="@{/js/script.js}"></script>

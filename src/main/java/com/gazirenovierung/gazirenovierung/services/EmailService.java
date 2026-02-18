@@ -43,7 +43,7 @@ public class EmailService {
                             "</div>";
 
             helper.setFrom("Ardihyseni45@gmail.com"); // MUST match your spring.mail.username
-            helper.setTo("gazi.muenchen@gmail.com");    // ALWAYS goes to your Gmail
+            helper.setTo("Ardihyseni988@gmail.com");    // ALWAYS goes to your Gmail
             helper.setSubject("New Lead: " + name);
             helper.setText(htmlContent, true);
             helper.setReplyTo(email); // Click 'Reply' in Gmail to respond directly to the client
