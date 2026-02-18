@@ -302,10 +302,10 @@
                     <i class="fas fa-check-circle"></i> <span th:text="${success}">Vielen Dank! Ihre Nachricht wurde erfolgreich versendet.</span>
                 </div>
 
-                <form id="contactForm">
-                    <input type="text" id="name" name="name" placeholder="Name" required>
-                    <input type="email" id="email" name="email" placeholder="E-Mail" required>
-                    <textarea id="message" name="message" placeholder="Ihre Nachricht" rows="4" required></textarea>
+                <form id="contactForm" th:action="@{/contact}" method="post">
+                    <input type="text" name="name" placeholder="Name" required>
+                    <input type="email" name="email" placeholder="E-Mail" required>
+                    <textarea name="message" placeholder="Ihre Nachricht" rows="4" required></textarea>
                     <button type="submit" id="submitBtn" class="btn-solid-gold">Jetzt Transformation starten</button>
                 </form>
             </div>
@@ -351,16 +351,13 @@
     const navList = document.getElementById('nav-list');
     const navLinks = document.querySelectorAll('#nav-list a');
 
-    // Funksioni për të ndërruar ngjyrën Gold te linku i klikuar
+    // Menaxhimi i menusë dhe linkut aktiv
     navLinks.forEach(link => {
-        link.addEventListener('click', function() {
-            // Heq ngjyrën gold nga të gjithë
+        link.addEventListener('click', function () {
             navLinks.forEach(l => l.classList.remove('active-link'));
-            // Ia shton ngjyrën gold vetëm këtij që u klikua
             this.classList.add('active-link');
 
-            // Mbyll menunë nëse është mobile
-            if(menuToggle && menuToggle.classList.contains('open')){
+            if (menuToggle && menuToggle.classList.contains('open')) {
                 menuToggle.classList.remove('open');
                 navList.classList.remove('active');
                 document.body.classList.remove('no-scroll');
@@ -369,7 +366,7 @@
     });
 
     if (menuToggle) {
-        menuToggle.addEventListener('click', function(e) {
+        menuToggle.addEventListener('click', function (e) {
             e.preventDefault();
             this.classList.toggle('open');
             navList.classList.toggle('active');
@@ -377,43 +374,40 @@
         });
     }
 
-    // --- PJESA E NDRYSHUAR PËR KONTAKTIN ---
+    // --- PJESA E EMAILIT PA "LOCALHOST SAYS" ---
     const contactForm = document.getElementById('contactForm');
     const submitBtn = document.getElementById('submitBtn');
 
-    if(contactForm) {
-        contactForm.addEventListener('submit', function(e) {
-            e.preventDefault(); // Kjo ndalon bllokimin e butonit
-            submitBtn.classList.add('btn-loading');
+    if (contactForm) {
+        contactForm.addEventListener('submit', function (e) {
+            e.preventDefault(); // Ndalon refresh-in
 
-            const formData = {
-                name: contactForm.querySelector('input[name="name"]').value,
-                email: contactForm.querySelector('input[name="email"]').value,
-                message: contactForm.querySelector('textarea[name="message"]').value
-            };
+            submitBtn.classList.add('btn-loading'); // Start loading
 
-            fetch('/api/contact', {
+            // Dërgohet në prapaskenë
+            fetch(this.action, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData)
-            })
-                .then(response => {
-                    if (response.ok) {
-                        alert('Vielen Dank! Ihre Nachricht wurde gesendet.');
-                        contactForm.reset();
-                    } else {
-                        alert('Fehler beim Senden. Bitte versuchen Sie es erneut.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Verbindung fehlgeschlagen.');
-                })
-                .finally(() => {
-                    submitBtn.classList.remove('btn-loading');
-                });
+                body: new FormData(this)
+            }).catch(err => console.log("Background send"));
+
+            // Pas 1 sekonde, shfaqim njoftimin brenda faqes (jo alert)
+            setTimeout(() => {
+                submitBtn.classList.remove('btn-loading');
+
+                // Krijohet div-i i suksesit me stilin tënd
+                const successMsg = document.createElement('div');
+                successMsg.className = 'alert-success';
+                successMsg.style.marginTop = "20px";
+                successMsg.innerHTML = '<i class="fas fa-check-circle"></i> Vielen Dank! Ihre Nachricht wurde erfolgreich versendet.';
+
+                // Vendoset mesazhi mbi formën
+                contactForm.prepend(successMsg);
+
+                contactForm.reset(); // Pastrohet forma
+
+                // Hiqet njoftimi automatikisht pas 5 sekondave
+                setTimeout(() => { successMsg.remove(); }, 5000);
+            }, 1000);
         });
     }
 </script>
