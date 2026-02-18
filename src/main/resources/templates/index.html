@@ -351,7 +351,7 @@
     const navList = document.getElementById('nav-list');
     const navLinks = document.querySelectorAll('#nav-list a');
 
-    // Menaxhimi i menusë dhe linkut aktiv
+    // Menaxhimi i menusë dhe linkut aktiv - MOS NDRYSHO
     navLinks.forEach(link => {
         link.addEventListener('click', function () {
             navLinks.forEach(l => l.classList.remove('active-link'));
@@ -374,38 +374,43 @@
         });
     }
 
-    // --- PJESA E EMAILIT PA "LOCALHOST SAYS" ---
+    // --- PJESA E EMAILIT - E KORRIGJUAR PËR RENDER ---
     const contactForm = document.getElementById('contactForm');
     const submitBtn = document.getElementById('submitBtn');
 
     if (contactForm) {
         contactForm.addEventListener('submit', function (e) {
-            e.preventDefault(); // Ndalon refresh-in
+            e.preventDefault();
 
-            submitBtn.classList.add('btn-loading'); // Start loading
+            submitBtn.classList.add('btn-loading');
 
-            // Dërgohet në prapaskenë
+            // Dërgimi real te serveri
             fetch(this.action, {
                 method: 'POST',
-                body: new FormData(this)
-            }).catch(err => console.log("Background send"));
+                body: new FormData(this),
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+                .then(response => {
+                    console.log("Server responded");
+                })
+                .catch(err => {
+                    console.log("Fetch error, but showing success anyway per logic");
+                });
 
-            // Pas 1 sekonde, shfaqim njoftimin brenda faqes (jo alert)
+            // Logjika jote e shfaqjes së mesazhit pas 1 sekonde (E PAPREKUR)
             setTimeout(() => {
                 submitBtn.classList.remove('btn-loading');
 
-                // Krijohet div-i i suksesit me stilin tënd
                 const successMsg = document.createElement('div');
                 successMsg.className = 'alert-success';
                 successMsg.style.marginTop = "20px";
                 successMsg.innerHTML = '<i class="fas fa-check-circle"></i> Vielen Dank! Ihre Nachricht wurde erfolgreich versendet.';
 
-                // Vendoset mesazhi mbi formën
                 contactForm.prepend(successMsg);
+                contactForm.reset();
 
-                contactForm.reset(); // Pastrohet forma
-
-                // Hiqet njoftimi automatikisht pas 5 sekondave
                 setTimeout(() => { successMsg.remove(); }, 5000);
             }, 1000);
         });
